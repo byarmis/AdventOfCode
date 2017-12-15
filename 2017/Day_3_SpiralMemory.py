@@ -95,12 +95,17 @@ def part_1(i):
     for test_in, test_out in tests:
         assert steps(test_in) == test_out, 'Steps for {} does not equal {} ({})'.format(test_in, test_out, steps(test_in))
 
-    print(steps(i))
+    return steps(i)
 
+class Matrix(object):
+    def __init__(self, m):
+        self.m = m
+        self._max = max(itertools.chain(*m))
 
+    def max(self):
+        return self._max
 
-def part_2(i):
-    def allocate_next_ring(m):
+    def _allocate_next_ring(self):
         '''
         Takes a matrix, returns the same data, but with a ring of None-s added 
         around the existing data.
@@ -109,87 +114,158 @@ def part_2(i):
         longer than original.
         '''
 
-        new_m = [[None for _ in range(len(m)+2)]]
-        for row in m:
+        new_m = [[None for _ in range(len(self.m)+2)]]
+        for row in self.m:
             new_m.append([None] + row + [None])
-        new_m.append([None for _ in range(len(m)+2)])
+        new_m.append([None for _ in range(len(self.m)+2)])
 
-        return new_m
+        self.m = new_m
 
-    def add_ring(m):
-        m = allocate_next_ring(m)
+    def add_ring(self):
+        self._allocate_next_ring()
+        self._add_right()
+        self._add_top()
+        self._add_left()
+        self._add_bottom()
 
+
+    def _add_right(self):
         # Second from bottom right
-        m[-2][-1] = m[-2][-2] + m[-3][-2]
+        self.m[-2][-1] = self.m[-2][-2] + self.m[-3][-2]
 
         # Go up the right side
         row = -3
-        while row > -len(m[0]) + 1:
-            new_val = m[row][-2]    # Next to it 
-            new_val += m[row-1][-2] # Diagonal up
-            new_val += m[row+1][-2] # Diagonal down
+        while row > -len(self.m) + 1:
+            new_val = self.m[row][-2]    # Next to it 
+            new_val += self.m[row-1][-2] # Diagonal up
+            new_val += self.m[row+1][-2] # Diagonal down
 
-            new_val += m[row+1][-1] # Below it
+            new_val += self.m[row+1][-1] # Below it
 
-            m[row][-1] = new_val
+            self.m[row][-1] = new_val
 
             row -= 1
 
         # Second from top right
-        m[1][-1] = m[1][-2] + m[2][-2] + m[2][-1]
+        self.m[1][-1] = self.m[1][-2] + self.m[2][-2] + self.m[2][-1]
 
         # Top right
-        m[0][-1] = m[1][-2] + m[1][-1]
+        self.m[0][-1] = self.m[1][-2] + self.m[1][-1]
 
+    def _add_top(self):
         # Go along the top
         # Second from top right
-        m[0][-2] = m[0][-1] + m[1][-2] + m[1][-1]
+        self.m[0][-2] = self.m[0][-1] + self.m[1][-2] + self.m[1][-1] + self.m[1][-3]
 
         # Go along the top
         col = -3
-        while col > -len(m[0]) + 1:
-            print col
-            new_val = m[0][col+1]  # Right
-            new_val += m[1][col] # Below
-            new_val += m[1][col+1] # Diagonal left
-            new_val += m[1][col-1] # Diagonal right
+        while col > -len(self.m[0]) + 1:
+            new_val = self.m[0][col+1]  # Right
+            new_val += self.m[1][col]   # Below
+            new_val += self.m[1][col+1] # Diagonal left
+            new_val += self.m[1][col-1] # Diagonal right
 
-            m[0][col] = new_val
+            self.m[0][col] = new_val
 
             col -= 1
 
-
         # Second from top left
+        self.m[0][1] = self.m[0][2] + self.m[1][1] + self.m[1][2]
 
         # Top left
+        self.m[0][0] = self.m[0][1] + self.m[1][1]
 
+    def _add_left(self):
+       # Go down the left
+        # Second from top left
+        self.m[1][0] = self.m[0][0] + self.m[0][1] + self.m[1][1] + self.m[2][1]
 
-        print(m)
         # Go down the left
+        row = 2
+        while row < len(self.m) - 2:
+            new_val = self.m[row][1]    # Right
+            new_val += self.m[row-1][1] # Diagonal up
+            new_val += self.m[row+1][1] # Diagonal down
+            new_val += self.m[row-1][0] # Above
+            
+            self.m[row][0] = new_val
+
+            row += 1
+
+        # Second from bottom left
+        self.m[-2][0] = self.m[-3][0] + self.m[-3][1] + self.m[-2][1]
+
+        # Bottom left corner
+        self.m[-1][0] = self.m[-2][0] + self.m[-2][1]
+
+    def _add_bottom(self):
         # Go accross the bottom
+        # Second from bottom left
+        self.m[-1][1] = self.m[-2][0] + self.m[-1][0] + self.m[-2][1] + self.m[-2][2]
 
-        return m
+        # Go along the bottom
+        col = 2
+        while col < len(self.m[0]) - 1:
+            new_val = self.m[-1][col-1]  # Left
+            new_val += self.m[-2][col-1] # Diagonal left
+            new_val += self.m[-2][col]   # Up
+            new_val += self.m[-2][col+1] # Diagonal right
 
-    def matrix_max(m):
-        return max(itertools.chain(*m))
+            self.m[-1][col] = new_val
+            col += 1
 
+        # Bottom right
+        self.m[-1][-1] = self.m[-1][-2] + self.m[-2][-2] + self.m[-2][-1]
 
-    matrix = [[  5,  4,  2],
-              [ 10,  1,  1],
-              [ 11, 23, 25]]
+        self._max = self.m[-1][-1]
 
-    add_ring(matrix)
-    # print(add_ring(matrix))
+    def search(self, i):
+        # Search right
+        prev = self.m[-2][-1]
+        for row in self.m[:-1][::-1]:
+            x = row[-1]
+            if prev < i < x:
+                return x
+            prev = x
 
-    assert add_ring(matrix) == [[147, 142, 133, 122,  59],
-                                [304,   5,   4,   2,  57],
-                                [330,  10,   1,   1,  54],
-                                [351,  11,  23,  25,  26],
-                                [362, 747, 806, 880, 931]]
+        # Search top
+        for x in self.m[0][::-1]:
+            if prev < i < x:
+                return x
+            prev = x
 
-    # while matrix_max(matrix) < i:
-        # matrix = add_ring(matrix)
+        # Search left
+        for row in self.m:
+            x = row[0]
+            if prev < i < x:
+                return x
+            prev = x
 
+        # Search bottom
+        for x in self.m[-1]:
+            if prev < i < x:
+                return x
+            prev = x
+
+        raise ValueError, 'Unable to find {}'.format(i)
+
+def part_2(i):
+
+    matrix = Matrix([[  5,  4,  2],
+                     [ 10,  1,  1],
+                     [ 11, 23, 25]])
+    matrix.add_ring()
+
+    assert matrix.m == [[147, 142, 133, 122,  59],
+                        [304,   5,   4,   2,  57],
+                        [330,  10,   1,   1,  54],
+                        [351,  11,  23,  25,  26],
+                        [362, 747, 806, 880, 931]]
+
+    while matrix.max() < i:
+        matrix.add_ring()
+
+    return matrix.search(i)
 
 if __name__ == '__main__':
     p = 361527
