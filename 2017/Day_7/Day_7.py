@@ -10,11 +10,8 @@ class Tree(object):
 
     def add(self, node):
         self._list.append(node)
-        self.set_head()
 
     def get_head(self):
-        self.set_head()
-        
         if self._head is None:
             raise ValueError, 'Tree has no parent yet'
         return self._head
@@ -49,21 +46,11 @@ class Node(object):
         self.children = children or []
         self.parent = None
 
-        self.link_children(tree)
-
     def __str__(self):
         return self.name
 
     def __eq__(self, other):
         return self.name == other
-
-    def link_children(self, T):
-        for child in self.children:
-            node = T.search(child)
-            if node is not None:
-                node.parent = self
-
-        T.set_head()
 
 def create_tree(filename):
     tree = Tree()
@@ -83,16 +70,15 @@ def create_tree(filename):
             n = Node(name, weight, tree, children)
             tree.add(n)
 
-    for node in tree:
-        node.link_children(tree)
-
     # Fix each node's list of children to be a list of nodes instead of a list of strings
-    q = [tree.get_head()]
-    while q:
-        node = q.pop(0)
+    for node in tree:
         if node.children:
             node.children = [tree.search(child) for child in node.children]
-            q.extend(node.children)
+
+            for child in node.children:
+                child.parent = node
+
+    tree.set_head()
 
     return tree
 
@@ -135,7 +121,7 @@ def part_2(tree, node):
 
 if __name__ == '__main__':
     t = create_tree('test.txt')
-    assert t.get_head() == 'tknk'
+    assert t.get_head() == 'tknk', 'Expected {}, got {}'.format('tknk', t.get_head())
     assert part_2(t, search_tree(t)) == 60
 
     t = create_tree('input.txt')
