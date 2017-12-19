@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import itertools
+from functools import reduce
 from operator import xor
 
 def knot_hash_round(i, length, repeat=1):
@@ -37,7 +38,7 @@ def knot_hash_round(i, length, repeat=1):
 
 def blocker(iterable, n=16):
     args = [iter(iterable)] * n
-    return itertools.izip_longest(*args)
+    return itertools.zip_longest(*args)
 
 def knot_hash(str_in):
     suffix = [17, 31, 73, 47, 23]
