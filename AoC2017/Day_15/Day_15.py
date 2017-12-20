@@ -22,26 +22,30 @@ def progress (iteration, total):
         print()
 
 class Generator:
-    def __init__(self, start, factor, product=2147483647):
+    def __init__(self, start, factor, product=2147483647, m=1):
         self.previous = start
         self.factor = factor
         self.product = product
+        self.multiple = m
 
         self._eq = None
 
     def __next__(self):
         self.previous = (self.previous * self.factor) % self.product
+        while self.previous % self.multiple != 0:
+            self.previous = (self.previous * self.factor) % self.product
+
         self._eq = self.previous & 0xFFFF
         return self.previous
 
     def __eq__(self, other):
         return self._eq == other._eq
 
-def counts(a_start, b_start, r):
-    A = Generator(start=a_start, factor=16807)
+def counts(a_start, b_start, r, m=(1,1)):
+    A = Generator(start=a_start, factor=16807, m=m[0])
     next(A)
 
-    B = Generator(start=b_start, factor=48271)
+    B = Generator(start=b_start, factor=48271, m=m[1])
     next(B)
 
     c = 0
@@ -91,6 +95,8 @@ if __name__ == '__main__':
     assert c == 588, '{} != 588'.format(c)
 
     c = counts(679, 771, 40000000)
-    print('Part One:{}'.format(c))
+    print('\nPart One:{}'.format(c))
 
+    c = counts(679, 771, 5000000, m=(4, 8))
+    print('\nPart Two:{}'.format(c))
 
