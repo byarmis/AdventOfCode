@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import itertools
@@ -68,22 +68,24 @@ def part_1(i):
         if i > 1:
             while i not in d[-1]:
                 d = add_another_layer(d)
+        else:
+            d.pop()
 
         # Traverse through d, outside in
         count = 0
+
         for layer in d[::-1]:
-            if i in layer:
+            count += 1
+            i, corner = layer[i]
+
+            if corner:
+                # We need to go diagonally, so add another
                 count += 1
-                i, corner = layer[i]
 
-                if corner:
-                    # We need to go diagonally, so add another
-                    count += 1
-
-                if i is None:
-                    # We're done, there is no next one
-                    # Center -> Center is no moves, so subtract one
-                    count -= 1
+            if i is None:
+                # We're done, there is no next one
+                # Center -> Center is no moves, so subtract one
+                count -= 1
 
         return count
 
@@ -247,7 +249,7 @@ class Matrix(object):
                 return x
             prev = x
 
-        raise ValueError, 'Unable to find {}'.format(i)
+        raise ValueError('Unable to find {}'.format(i))
 
 def part_2(i):
 
