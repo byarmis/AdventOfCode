@@ -13,9 +13,13 @@ class Array:
             self._a = a
 
         self.cnt = sum(sum(i) for i in self._a)
-        self.hash = hash(tuple(tuple(i) for i in self._a))
+        self._hash = None
 
     def __hash__(self):
+        if self._hash is None:
+            _hash = ''.join(str(int(j)) for i in self._a for j in i)
+            self.hash = hash(_hash)
+
         return self.hash
 
     def __len__(self):
@@ -34,16 +38,8 @@ class Array:
 
         if self.cnt != other.cnt:
             return False
-
-        if hash(self) != hash(other):
-            return False
-
-        for i in range(len(self._a)):
-            for j in range(len(self._a[0])):
-                if self._a[i][j] != other._a[i][j]:
-                    return False
-
-        return True
+        
+        return hash(self) == hash(other)
 
     @property
     def mirror(self): 
@@ -74,6 +70,7 @@ class Grid:
     def __init__(self, inp):
         self.array = Array(inp)
 
+        self._hash = None
         self.perms = None
         self.generate_permutations()
 
@@ -84,7 +81,9 @@ class Grid:
         return len(self.array)
 
     def __hash__(self):
-        return hash(self.array)
+        if self._hash is None:
+            self._hash = min(hash(p) for p in self.perms)
+        return self._hash
 
     def generate_permutations(self):
         perms = [self.array] # Normal
@@ -106,11 +105,7 @@ class Grid:
         if self.cnt != other.cnt:
             return False
 
-        for s, o in product(self.perms, other.perms):
-            if s == o:
-                return True
-
-        return False
+        return hash(self) == hash(other)
 
     def __getitem__(self, x):
         return self.array[x]
@@ -165,17 +160,7 @@ class Art:
             # Grow the subgrids
             new_arrays = []
             for row in sub_arrays:
-                new_row = []
-
-                for array in row:
-                    for k, v in self.enhancement_dict.items():
-                        if array == k:
-                            new_row.append(v)
-                            break
-                    else:
-                        raise AssertionError('No enhancement found')
-
-                new_arrays.append(new_row)
+                new_arrays.append([self.enhancement_dict[a] for a in row])
 
             return new_arrays
 
@@ -184,7 +169,6 @@ class Art:
             # Join everything back together
 
             new_grid = []
-            big_row = 0
 
             for big_row in new_arrays:
                 # Get the Nth row of each subgrid
