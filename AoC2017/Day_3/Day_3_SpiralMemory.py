@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import itertools
+from collections import defaultdict
 from itertools import product
 
 def part_1(i):
@@ -102,7 +102,7 @@ def part_1(i):
 
 
 class Point:
-    def __init__(self, x, y=None):
+    def __init__(self, x, y):
         self.x = x
         self.y = y
 
@@ -121,22 +121,18 @@ class Point:
 class part_2:
     def __init__(self):
         self.DIRECTIONS = tuple(Point(p[0], p[1]) for p in product([-1,0,1], repeat=2) if p != (0,0))
-        self.points = {Point(0,0): 1}
+        self.points = defaultdict(int)
+        self.points[Point(0,0)] = 1
+
         self.point_stack = [1]
 
     def neighbor_sum(self, p):
-        to_add = 0
-        for d in self.DIRECTIONS:
-            try:
-                to_add += self.points[p+d]
-            except KeyError:
-                continue
-        return to_add
+        return sum(self.points[p+d] for d in self.DIRECTIONS)
  
     def run(self, goal):
         r = 1
         
-        while self.point_stack[-1] < goal:
+        while self.point_stack[-1] <= goal:
             self.point_stack = []
             # Add right
             for y in range(-r+1, r+1):
@@ -144,7 +140,7 @@ class part_2:
                 self.points[Point(r, y)] = ns
                 self.point_stack.append(ns)
 
-            # Add top, left to right, except the top corner
+            # Add top, right to left
             for x in range(r, -r-1, -1):
                 ns = self.neighbor_sum(Point(x, r))
                 self.points[Point(x, r)] = ns
