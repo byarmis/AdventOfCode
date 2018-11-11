@@ -137,6 +137,7 @@ class part_2:
         r = 1
         
         while self.point_stack[-1] < goal:
+            self.point_stack = []
             # Add right
             for y in range(-r+1, r+1):
                 ns = self.neighbor_sum(Point(r, y))
