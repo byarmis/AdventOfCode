@@ -118,58 +118,59 @@ class Point:
     def __hash__(self):
         return hash((self.x, self.y))
 
-def part_2(i):
-    DIRECTIONS = tuple(Point(p[0], p[1]) for p in product([-1,0,1], repeat=2) if p != (0,0))
+class part_2:
+    def __init__(self):
+        self.DIRECTIONS = tuple(Point(p[0], p[1]) for p in product([-1,0,1], repeat=2) if p != (0,0))
+        self.points = {Point(0,0): 1}
+        self.point_stack = [1]
 
-    points = {Point(0,0): 1}
-    point_stack = [1]
-    r = 1
-
-    def neighbor_sum(p):
+    def neighbor_sum(self, p):
         to_add = 0
-        for d in DIRECTIONS:
+        for d in self.DIRECTIONS:
             try:
-                to_add += points[p+d]
+                to_add += self.points[p+d]
             except KeyError:
                 continue
-
         return to_add
-     
-    while point_stack[-1] < i:
-        # Add right
-        for y in range(-r+1, r+1):
-            ns = neighbor_sum(Point(r, y))
-            points[Point(r, y)] = ns
-            point_stack.append(ns)
+ 
+    def run(self, goal):
+        r = 1
+        
+        while self.point_stack[-1] < goal:
+            # Add right
+            for y in range(-r+1, r+1):
+                ns = self.neighbor_sum(Point(r, y))
+                self.points[Point(r, y)] = ns
+                self.point_stack.append(ns)
 
-        # Add top, left to right, except the top corner
-        for x in range(r, -r-1, -1):
-            ns = neighbor_sum(Point(x, r))
-            points[Point(x, r)] = ns
-            point_stack.append(ns)
+            # Add top, left to right, except the top corner
+            for x in range(r, -r-1, -1):
+                ns = self.neighbor_sum(Point(x, r))
+                self.points[Point(x, r)] = ns
+                self.point_stack.append(ns)
 
-        # Add left, top to bottom
-        for y in range(r, -r-1, -1):
-            ns = neighbor_sum(Point(-r, y))
-            points[Point(-r, y)] = ns
-            point_stack.append(ns)
+            # Add left, top to bottom
+            for y in range(r, -r-1, -1):
+                ns = self.neighbor_sum(Point(-r, y))
+                self.points[Point(-r, y)] = ns
+                self.point_stack.append(ns)
 
-        # Add bottom
-        for x in range(-r, r+1):
-            ns = neighbor_sum(Point(x, -r))
-            points[Point(x, -r)] = ns
-            point_stack.append(ns)
+            # Add bottom
+            for x in range(-r, r+1):
+                ns = self.neighbor_sum(Point(x, -r))
+                self.points[Point(x, -r)] = ns
+                self.point_stack.append(ns)
 
-        r += 1
+            r += 1
 
-    while point_stack[-1] > i:
-        # Pop from the stack until we go less than the value we're looking for
-        ret_val = point_stack.pop()
+        while self.point_stack[-1] > goal:
+            # Pop from the stack until we go less than the value we're looking for
+            ret_val = self.point_stack.pop()
 
-    return ret_val
+        return ret_val
 
 if __name__ == '__main__':
     p = 361527
     print(part_1(p))
-    print(part_2(p))
+    print(part_2().run(p))
 
