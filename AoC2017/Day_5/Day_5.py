@@ -27,5 +27,6 @@ if __name__ == '__main__':
         list_in = [int(i) for i in f.readlines()]
 
     print('Part One:{}'.format(jumps_to_exit(list_in[:], part_one)))
+
     print('Part Two:{}'.format(jumps_to_exit(list_in[:], part_two)))
 
