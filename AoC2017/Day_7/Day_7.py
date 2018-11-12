@@ -1,19 +1,21 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 import collections
+import re
+from functools import lru_cache
 
 class Tree(object):
     def __init__(self):
-        self._list = []
+        self._dict = {}
         self._head = None
 
     def add(self, node):
-        self._list.append(node)
+        self._dict[node.name] = node
 
     def get_head(self):
         if self._head is None:
-            raise ValueError, 'Tree has no parent yet'
+            raise ValueError('Tree has no head yet')
         return self._head
 
     def set_head(self):
@@ -21,36 +23,41 @@ class Tree(object):
         for node in self:
             if node.parent is None:
                 self._head = node
+                return
 
     def __iter__(self):
-        for n in self._list:
-            yield n
+        return iter(self._dict.values())
 
     def search(self, N):
-        for node in self._list:
-            if node.name == N:
-                return node
+        return self._dict[N]
 
+    @lru_cache(maxsize=None)
     def aggregate_weight(self, N):
-        weight = 0
+        weight = N.weight
         for child in N.children:
             weight += self.aggregate_weight(child)
-
-        return weight + N.weight
+        return weight 
 
 
 class Node(object):
     def __init__(self, name, weight, tree, children=None):
+        r = r'.*\((\d*)\).*'
+        self.weight = int(re.match(r, weight).group(1))
+
         self.name = name
-        self.weight = int(weight)
         self.children = children or []
         self.parent = None
+        self._hash = hash(self.name)
 
     def __str__(self):
         return self.name
 
     def __eq__(self, other):
         return self.name == other
+
+    def __hash__(self):
+        return self._hash
+
 
 def create_tree(filename):
     tree = Tree()
@@ -62,21 +69,20 @@ def create_tree(filename):
 
             else:
                 name_and_weight = line
-                children = None
+                children = ''
 
-            name, weight = name_and_weight.translate(None, '()').strip().split(' ')
-            children = [c.strip() for c in children.split(',')] if children else None
+            name, weight = name_and_weight.strip().split(' ')
+            children = [c.strip() for c in children.split(',') if c] 
 
             n = Node(name, weight, tree, children)
             tree.add(n)
 
     # Fix each node's list of children to be a list of nodes instead of a list of strings
     for node in tree:
-        if node.children:
-            node.children = [tree.search(child) for child in node.children]
+        node.children = [tree.search(child) for child in node.children]
 
-            for child in node.children:
-                child.parent = node
+        for child in node.children:
+            child.parent = node
 
     tree.set_head()
 
@@ -123,8 +129,8 @@ if __name__ == '__main__':
     t = create_tree('test.txt')
     assert t.get_head() == 'tknk', 'Expected {}, got {}'.format('tknk', t.get_head())
     assert part_2(t, search_tree(t)) == 60
-
     t = create_tree('input.txt')
+
     print('Part One:{}'.format(t.get_head()))
     print('Part Two:{}'.format(part_2(t, search_tree(t))))
 
