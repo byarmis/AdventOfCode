@@ -150,8 +150,6 @@ def part_1(test=False):
 
     return three_plus_count, names_num
 
-p1 = part_1()
-print(p1[0])
 
 def part_2(names_num):
     num_names = {v:k for k, v in names_num.items()}
@@ -182,5 +180,8 @@ def part_2(names_num):
     
     return registers[0]
 
-print(part_2(p1[1]))
+if __name__=='__main__':
+    p1 = part_1()
+    print(p1[0])
+    print(part_2(p1[1]))
 
