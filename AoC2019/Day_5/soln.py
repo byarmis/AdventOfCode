@@ -2,8 +2,9 @@
 # -*- coding: utf-8 -*-
 
 from itertools import zip_longest
+from collections import deque
 
-def intcode(program, input_id):
+def intcode(program, input_queue):
 
     i = 0
     ret_val = None
@@ -27,7 +28,7 @@ def intcode(program, input_id):
             if opcode == 3:
                 if ret_val is not None:
                     raise ValueError('Multiple inputs found')
-                program[a] = input_id
+                program[a] = input_queue.popleft()
 
             elif opcode == 4:
                 v = a if mode else program[a]
@@ -91,20 +92,20 @@ if __name__ == '__main__':
 
     r = intcode([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
 1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
-999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], 7)
+999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], deque([7]))
     assert r == 999, r
 
     r = intcode([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
 1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
-999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], 8)
+999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], deque([8]))
     assert r == 1000, r
 
     r = intcode([3,21,1008,21,8,20,1005,20,22,107,8,21,20,1006,20,31,
 1106,0,36,98,0,0,1002,21,125,20,4,20,1105,1,46,104,
-999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], 9)
+999,1105,1,46,1101,1000,1,20,4,20,1105,1,46,98,99], deque([9]))
     assert r == 1001, r
 
 
-    print(f'Part 1: {intcode(program[:], 1)}')
-    print(f'Part 2: {intcode(program[:], 5)}')
+    print(f'Part 1: {intcode(program[:], deque([1]))}')
+    print(f'Part 2: {intcode(program[:], deque([5]))}')
 
