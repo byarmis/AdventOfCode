@@ -41,3 +41,4 @@ if __name__ == '__main__':
     res = reallocate_cycle_count(p)
     print('Part one:{}'.format(res.count))
     print('Part two:{}'.format(reallocate_cycle_count(res.final_val).count))
+
