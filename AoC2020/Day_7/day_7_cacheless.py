@@ -37,12 +37,10 @@ def get_rules(raw):
     return rules
 
 # Part one
-from functools import lru_cache
 
 def part_1(raw):
     rules = get_rules(raw)
 
-    @lru_cache(maxsize=None)
     def can_contain_gold(color):
         if rules[color] == [[]]:
             return False
@@ -56,7 +54,6 @@ def part_1(raw):
         if can_contain_gold(color):
             cnt += 1
 
-    print(can_contain_gold.cache_info())
     return cnt
 
 print('Part one:', part_1(raw))
@@ -65,7 +62,6 @@ def part_2(raw):
     rules = get_rules(raw)
 
     # Part two
-    @lru_cache(maxsize=None)
     def get_containing_bags(color):
         if rules[color] == [[]]:
             return 0
@@ -74,7 +70,6 @@ def part_2(raw):
 
 
     r = get_containing_bags('shiny gold')
-    print(get_containing_bags.cache_info())
 
     return r
 
