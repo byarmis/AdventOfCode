@@ -93,13 +93,16 @@ while changed:
     changed = False
     for rule_idx, ticket_idx in possibilities.items():
         if isinstance(ticket_idx, set) and len(ticket_idx) == 1:
-            possibilities[rule_idx] = ticket_idx.pop()
+            p = ticket_idx.pop()
+            possibilities[rule_idx] = p
 
             for to_delete in possibilities:
                 if isinstance(possibilities[to_delete], set):
-                    possibilities[to_delete].discard(possibilities[rule_idx])
+                    possibilities[to_delete].discard(p)
 
             changed = True
+
+assert not any(isinstance(i, set) for i in possibilities)
 
 mult = 1
 for loc, rule in enumerate(rules):
