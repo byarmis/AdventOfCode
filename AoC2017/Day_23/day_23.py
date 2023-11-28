@@ -1,12 +1,19 @@
-def part_1(registers, instructions):
+from typing import Optional
+
+def part_1(registers, instructions, limit: Optional[int]=None):
     ptr = 0
     mul_cnt = 0
     ins_cnt = 0
 
-    while ins_cnt < 100 and 0 <= ptr < len(instructions):
-        ins_cnt += 1 
+    stop = False
+
+    while not stop and 0 <= ptr < len(instructions):
         raw_ins = instructions[ptr]
         ins, x, y = raw_ins.split()
+        ins_cnt += 1
+
+        if limit:
+            stop = ins_cnt > limit
 
         match ins:
             case 'set':
@@ -50,7 +57,7 @@ def part_1(registers, instructions):
 
 
 def part_2(registers, instructions):
-    new_reg = part_1(registers, instructions)[1]
+    new_reg = part_1(registers, instructions, limit=100)[1]
 
     start = new_reg['b']
     end = new_reg['c']
