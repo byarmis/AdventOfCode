@@ -11,11 +11,11 @@ def solve(lines):
             if char.isdigit():
                 num += char
             if (char.isdigit() and x == len(line) - 1) or (not char.isdigit() and num):
-                dx = [-1, 0, 1]
-                dy = [-1, 0, 1]
+                dx = {-1, 0, 1}
+                dy = {-1, 0, 1}
 
-                for num_idx in range(1, len(num) + 2 - int(char.isdigit())):
-                    dx.append(-num_idx)
+                for num_idx in range(int(char.isdigit()), len(num) + 2 - int(char.isdigit())):
+                    dx.add(-num_idx)
 
                 candidates = []
                 for x_mod, y_mod in itertools.product(dx, dy):
@@ -32,6 +32,7 @@ def solve(lines):
                         continue
 
                     candidates.append(lines[y+y_mod][x+x_mod])
+
                 if any(x != '.' and not x.isdigit() for x in candidates):
                     nums.append(int(num))
 
@@ -51,15 +52,21 @@ test_lines_1 = [
         '.664.598.', 
         '.+12....1', 
         '11.....+1', 
-        '1......1+', 
+        '1......11', 
         ]
+
 test_lines_2 = [line+'.' for line in test_lines_1]
 test_lines_3 = ['.'+line for line in test_lines_1]
 test_lines_4 = ['.'+line+'.' for line in test_lines_1]
 
 test_lines_5 = [
         '..4361....',
-        '.24+++2...',
+        '.35+++1...',
+        ]
+
+test_lines_6 = [
+        '..+..',
+        '4397.',
         ]
 
 
@@ -69,11 +76,13 @@ test_lines = [
         test_lines_3,
         test_lines_4,
         test_lines_5,
+        test_lines_6,
         ]
 
 for loc, test_line in enumerate(test_lines):
     test = solve(test_line)
-    assert  test == 4361+26, f'{loc}: {4361+14} expected, got {test}'
+    expected = 4361+12+22+2
+    assert  test == expected, f'{loc}: {expected} expected, got {test}'
 
 print('tests pass')
 
