@@ -1,10 +1,13 @@
 import itertools
+import math
+from collections import defaultdict
 
 with open('input.txt') as f:
     lines = [line.strip() for line in f.readlines()]
 
 def solve(lines):
     nums = []
+    gears = defaultdict(list)
     for y, line in enumerate(lines):
         num = ''
         for x, char in enumerate(line):
@@ -27,14 +30,18 @@ def solve(lines):
                     if y + y_mod < 0 or y+y_mod > len(lines) - 1:
                         continue
 
-                    candidates.add(lines[y+y_mod][x+x_mod])
+                    candidate = lines[y+y_mod][x+x_mod]
+                    if candidate == '*':
+                        gears[(x+x_mod, y+y_mod)].append(int(num))
+
+                    candidates.add(candidate)
 
                 if any(candidates - set('1234567890.')):
                     nums.append(int(num))
 
                 num = ''
 
-    return sum(nums)
+    return sum(nums), sum([gear[0] * gear[1] for gear in gears.values() if len(gear) == 2])
 
 provided_lines = [
         '467..114.', 
@@ -69,14 +76,16 @@ test_cases = {
         }
 
 for expected, test_lines in test_cases.items():
-    test = solve(test_lines)
+    test = solve(test_lines)[0]
     assert  test == expected, f'{expected} expected, got {test}'
 
-solution = solve(lines)
+solution = solve(lines)[0]
 assert solution != 554613, solution 
 assert solution != 552006, solution 
 assert solution != 552463, solution 
 assert solution != 536628, solution 
 assert solution != 536171, solution 
-print('Part 1: ', solve(lines))
+
+print('Part 1: ', solve(lines)[0])
+print('Part 2: ', solve(lines)[1])
 
