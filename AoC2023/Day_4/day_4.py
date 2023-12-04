@@ -16,10 +16,10 @@ def part_1(lines):
         if my_nums & winning_nums:
             points += 2**(len(my_nums & winning_nums) - 1)
 
-    print(points)
+    return points
 
 
-part_1(lines)
+print('Part 1: ', part_1(lines))
 
 def part_2(lines):
     cards = dict()
@@ -41,17 +41,12 @@ def part_2(lines):
             card_queue.append(card_num + i)
 
     copies = defaultdict(int)
-    iters = 0
     while card_queue:
         c = card_queue.pop()
         copies[c] += 1
-        iters += 1
 
         for i in range(1, cards[c]+1):
             card_queue.append(c + i)
-
-        if iters % 1000 == 0:
-            print(len(card_queue))
 
     return sum(copies.values()) + len(lines)
 
