@@ -21,7 +21,7 @@ class Map:
     def __getitem__(self, item):
         for line in self.lines:
             source, dest, length = line
-            if source <= item <= source + length:
+            if source <= item < source + length:
                 return dest + (item - source) 
 
         return item
