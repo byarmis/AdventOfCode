@@ -45,10 +45,11 @@ def part_1(lines):
         else:
             line_chunk.append(line)
 
+    m.append(Map(line_chunk))
     min_loc = float('inf')
 
     for seed in seeds:
-        val = m[5][m[4][m[3][m[2][m[1][m[0][seed]]]]]]
+        val = m[6][m[5][m[4][m[3][m[2][m[1][m[0][seed]]]]]]]
         min_loc = min(val, min_loc)
 
     return min_loc
