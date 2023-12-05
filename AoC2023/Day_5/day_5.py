@@ -125,9 +125,17 @@ def part_2(lines):
     min_loc = float('inf')
 
     seed_ranges = [range(seed_start, seed_start + seed_size) for seed_start, seed_size in seed_pairs]
+
+    length = sum(len(r) for r in seed_ranges)
+    i = 0
+
     for seed in itertools.chain(*seed_ranges):
+        i += 1
         val = m[6][m[5][m[4][m[3][m[2][m[1][m[0][seed]]]]]]]
         min_loc = min(val, min_loc)
+
+        if i % 1000000 == 0:
+            print(f'{i/length * 100:.4f}%')
 
     return min_loc 
 
@@ -169,5 +177,5 @@ test_lines = [
 
 t = part_2(test_lines)
 assert t == 46, t
-print('part 2 test pass')
 print('Part 2: ', part_2(lines))
+
