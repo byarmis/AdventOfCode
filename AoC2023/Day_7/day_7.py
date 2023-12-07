@@ -86,19 +86,20 @@ class WinType2:
             c = Counter(temp_s)
 
             if c.most_common(1)[0][1] == 5:
-                vals.append( 0)
+                vals.append(0)
             elif c.most_common(1)[0][1] == 4:
-                vals.append( 1)
+                vals.append(1)
             elif c.most_common(2)[0][1] == 3 and c.most_common(2)[1][1] == 2:
-                vals.append( 2)
+                vals.append(2)
             elif c.most_common(1)[0][1] == 3:
-                vals.append( 3)
+                vals.append(3)
             elif c.most_common(2)[0][1] == 2 and c.most_common(2)[1][1] == 2:
-                vals.append( 4)
+                vals.append(4)
             elif c.most_common(1)[0][1] == 2:
-                vals.append( 5)
+                vals.append(5)
             elif c.most_common(1)[0][1] == 1:
-                vals.append( 6)
+                vals.append(6)
+
         self.val = min(vals)
 
 def part_2(lines):
