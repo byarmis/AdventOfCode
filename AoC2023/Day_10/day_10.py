@@ -42,7 +42,14 @@ def part_1(lines):
         tc = lines[tn.y][tn.x] 
 
         if tc != '.' and tn.y >= 0 and tn.x >= 0:
-            starting_directions.append(fd)
+            if fd == 'N' and tc in '|7F':
+                starting_directions.append(fd)
+            elif fd == 'S' and tc in '|LJ':
+                starting_directions.append(fd)
+            elif fd == 'E' and tc in '-LJ':
+                starting_directions.append(fd)
+            elif fd == 'W' and tc in '-FL':
+                starting_directions.append(fd)
 
     for starting_direction in starting_directions:
         cur_char = None
@@ -56,7 +63,6 @@ def part_1(lines):
         while cur_char != 'S':
             cur_char = lines[point.y][point.x]
 
-            print(cur_char)
             if cur_char == '|':
                 if facing_direction == 'N':
                     point.y -= 1
