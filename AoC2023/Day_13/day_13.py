@@ -65,33 +65,6 @@ class Island:
 
         return True
 
-    def __repr__(self) -> str:
-        out_rows = []
-        first_row = [' '] * 3 + [' ']*len(self.rows[0]) + [' ']*3
-        if self._mirror_type is not None and self._mirror_type[0] == 'col':
-            first_row[self._mirror_type[1]+3] = '>'
-            first_row[self._mirror_type[1]+4] = '<'
-
-        out_rows.append(''.join(first_row))
-        for i, row in enumerate(self.rows):
-            if self._mirror_type == ('row', i):
-                mirror_symbol = 'v'
-            elif self._mirror_type == ('row', i-1):
-                mirror_symbol = '^'
-            else:
-                mirror_symbol =' '
-            out_rows.append(f"{i+1:02d}{mirror_symbol}{''.join(row)}{mirror_symbol}{i+1:02d}")
-
-        out_rows.append(''.join(first_row))
-        
-        return '\n'.join(out_rows)
-
-    def __eq__(self, other) -> bool:
-        return self.rows == other.rows
-
-    def __hash__(self) -> int:
-        return hash(''.join(r) for r in self.rows)
-
     def mirror_type(self) -> Optional[Tuple[str, int]]:
         if self._mirror_type != -1:
             return self._mirror_type
