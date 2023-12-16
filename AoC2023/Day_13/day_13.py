@@ -1,3 +1,4 @@
+from typing import Tuple, Generator, Optional
 from collections import defaultdict
 from copy import deepcopy
 
@@ -14,42 +15,49 @@ class Island:
         self._mirror_type = -1
         self._mirror_type = self.mirror_type()
 
-    def is_mirror_row(self, idx):
-        is_mirror = self._is_mirror(self.rows, idx)
-        if is_mirror:
-            self._mirror_type = ('row', idx)
-        return is_mirror
+    def is_mirror_row(self, idx: int) -> bool:
+        if self._mirror_type != -1 and self._mirror_type is not None and self._mirror_type == ('row', idx):
+            return True
+        return False
 
+    def is_mirror_column(self, idx: int) -> bool:
+        if self._mirror_type != -1 and self._mirror_type is not None and self._mirror_type == ('col', idx):
+            return True
+        return False
 
-    def is_mirror_column(self, idx):
-        is_mirror = self._is_mirror(self.columns, idx)
-        if is_mirror:
-            self._mirror_type = ('col', idx)
+    def find_mirror_col(self) -> int:
+        try:
+            if self._mirror_type[0] == 'col':
+                return self._mirror_type[1]
+            raise ValueError
 
-        return is_mirror
+        except TypeError:
+            for i in range(len(self.columns)-1):
+                if self._is_mirror(self.columns, i):
+                    self._mirror_type = ('col', i)
+                    return i
 
-    def find_mirror_col(self):
-        for c in range(len(self.columns)-1):
-            if self.is_mirror_column(c):
-                return c
+            raise ValueError
 
-        raise ValueError
+    def find_mirror_row(self) -> int:
+        try:
+            if self._mirror_type[0] == 'row':
+                return self._mirror_type[1]
 
+            raise ValueError
 
-    def find_mirror_row(self):
-        for r in range(len(self.rows)-1):
-            if self.is_mirror_row(r):
-                return r
+        except TypeError:
+            for i in range(len(self.rows)-1):
+                if self._is_mirror(self.rows, i):
+                    self._mirror_type = ('row', i)
+                    return i
 
-        raise ValueError
+            raise ValueError
 
     @staticmethod
-    def _is_mirror(arr, idx):
-        A = arr[idx+1:]
-        B = arr[:idx+1][::-1]
-
-        if not A or not B:
-            return False
+    def _is_mirror(arr, idx) -> bool:
+        A = arr[:idx+1][::-1]
+        B = arr[idx+1:]
 
         for a, b in zip(A, B):
             if a != b:
@@ -57,16 +65,14 @@ class Island:
 
         return True
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         out_rows = []
-        #first_row = [' '] * 3 + [str(i+1) for i in range(len(self.rows[0]))] + [' ']*3
-        second_row = [' '] * 3 + [' ']*len(self.rows[0]) + [' ']*3
+        first_row = [' '] * 3 + [' ']*len(self.rows[0]) + [' ']*3
         if self._mirror_type is not None and self._mirror_type[0] == 'col':
-            second_row[self._mirror_type[1]+3] = '>'
-            second_row[self._mirror_type[1]+4] = '<'
+            first_row[self._mirror_type[1]+3] = '>'
+            first_row[self._mirror_type[1]+4] = '<'
 
-        #out_rows.append(''.join(first_row))
-        out_rows.append(''.join(second_row))
+        out_rows.append(''.join(first_row))
         for i, row in enumerate(self.rows):
             if self._mirror_type == ('row', i):
                 mirror_symbol = 'v'
@@ -76,15 +82,17 @@ class Island:
                 mirror_symbol =' '
             out_rows.append(f"{i+1:02d}{mirror_symbol}{''.join(row)}{mirror_symbol}{i+1:02d}")
 
-        out_rows.append(''.join(second_row))
-        #out_rows.append(''.join(first_row))
+        out_rows.append(''.join(first_row))
         
         return '\n'.join(out_rows)
 
-    def __eq__(self, other):
+    def __eq__(self, other) -> bool:
         return self.rows == other.rows
 
-    def mirror_type(self):
+    def __hash__(self) -> int:
+        return hash(''.join(r) for r in self.rows)
+
+    def mirror_type(self) -> Optional[Tuple[str, int]]:
         if self._mirror_type != -1:
             return self._mirror_type
 
@@ -108,51 +116,34 @@ class Island:
 
         return self._mirror_type
 
-    def find_mirror_cols(self):
+    def find_mirror_cols(self) -> Generator[int, None, None]:
         for c in range(len(self.columns)-1):
-            if self.is_mirror_column(c):
+            if self._is_mirror(self.columns, c):
                 yield c
 
-        raise ValueError
 
-
-    def find_mirror_rows(self):
+    def find_mirror_rows(self) -> Generator[int, None, None]:
         for r in range(len(self.rows)-1):
-            if self.is_mirror_row(r):
+            if self._is_mirror(self.rows, r):
                 yield r
 
-        raise ValueError
+    def potential_mirror_types(self) -> Generator[Tuple[str, int], None, None]:
+        yield from (('row', r) for r in self.find_mirror_rows())
+        yield from (('col', c) for c in self.find_mirror_cols())
 
 
-    def potential_mirror_types(self):
-        try:
-            yield from (('row', r) for r in self.find_mirror_rows())
-        except ValueError:
-            pass
-        try:
-            yield from (('col', c) for c in self.find_mirror_cols())
-        except ValueError:
-            pass
-        return
-
-
-    def find_alternate(self):
+    def find_alternate(self) -> 'Island':
         for x, row in enumerate(self.rows):
             for y, char in enumerate(row):
                 row_copy = deepcopy(self.rows)
                 row_copy[x][y] = '#' if row_copy[x][y] == '.' else '.'
                 new_rows='\n'.join(''.join(a for a in b) for b in row_copy)
                 new_island = Island(new_rows)
-
                 for mt in new_island.potential_mirror_types():
-                    if self.mirror_type() == mt:
+                    if self._mirror_type == mt:
                         continue
 
-
-                    print('-'*20)
-                    print(self)
-                    print(new_island)
-
+                    new_island._mirror_type = mt
                     return new_island
 
         raise ValueError('idk')
@@ -162,19 +153,19 @@ with open('input.txt') as f:
     lines = f.read()
 
 
-def part_1(lines):
+def part_1(lines:str) -> int:
     islands = [Island(line) for line in lines.split('\n\n')]
     summary = 0
 
     for island in islands:
         try:
-            summary += 100*(island.find_mirror_row() + 1)
+            summary += 100*( island.find_mirror_row()+ 1)
         except ValueError:
-            summary += island.find_mirror_col() + 1
+            summary +=  (island.find_mirror_col())+ 1
 
     return summary
 
-def part_2(lines):
+def part_2(lines:str) -> int:
     summary = 0
 
     for island in lines.split('\n\n'):
@@ -216,6 +207,6 @@ t = part_2(test_lines)
 assert t == 400, t
 
 t = part_2(lines)
-assert t < 39517
+assert t < 39517, t
 print('Part 2: ', t)
 
