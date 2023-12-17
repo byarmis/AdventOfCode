@@ -78,20 +78,11 @@ def part_2(lines: List[str]) -> int:
     max_y = len(lines)
     max_x = len(lines[0])
 
-    seen_round_rocks = {
-        round_rocks,
-    }
-
-    for i in range(cycles):
+    for _ in range(1_000):
         round_rocks = roll(round_rocks, cubes, -1, 0, max_y, max_x)  # North
         round_rocks = roll(round_rocks, cubes, 0, -1, max_y, max_x)  # West
         round_rocks = roll(round_rocks, cubes, 1, 0, max_y, max_x)  # South
         round_rocks = roll(round_rocks, cubes, 0, 1, max_y, max_x)  # East
-
-        if round_rocks in seen_round_rocks:
-            break
-        else:
-            seen_round_rocks.add(round_rocks)
 
     return torque(len(lines), round_rocks)
 
