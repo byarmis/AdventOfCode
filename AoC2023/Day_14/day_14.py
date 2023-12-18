@@ -71,14 +71,30 @@ def part_1(lines: List[str]) -> int:
 
 
 def part_2(lines: List[str]) -> int:
-    cycles = 1_000_000_000
+    CYCLES = 1_000_000_000
 
     round_rocks, cubes = get_rocks_and_cubes(lines)
 
     max_y = len(lines)
     max_x = len(lines[0])
 
-    for _ in range(1_000):
+    rock_cache = dict()
+
+    for i in range(CYCLES):
+        round_rocks = roll(round_rocks, cubes, -1, 0, max_y, max_x)  # North
+        round_rocks = roll(round_rocks, cubes, 0, -1, max_y, max_x)  # West
+        round_rocks = roll(round_rocks, cubes, 1, 0, max_y, max_x)  # South
+        round_rocks = roll(round_rocks, cubes, 0, 1, max_y, max_x)  # East
+
+        if round_rocks in rock_cache:
+            break
+        else:
+            rock_cache[round_rocks] = i
+
+    cycles_to_go = CYCLES - i - 1
+    cycle_length = i - rock_cache[round_rocks]
+
+    for _ in range(cycles_to_go % cycle_length):
         round_rocks = roll(round_rocks, cubes, -1, 0, max_y, max_x)  # North
         round_rocks = roll(round_rocks, cubes, 0, -1, max_y, max_x)  # West
         round_rocks = roll(round_rocks, cubes, 1, 0, max_y, max_x)  # South
