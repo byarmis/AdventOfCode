@@ -69,27 +69,43 @@ test_lines = [
 t = part_1(test_lines)
 assert t == 62, t
 
-chrstine_test = [
-    'R 3 x', 
-    'D 3 x', 
-    'R 3 x', 
-    'U 3 x', 
-    'R 3 x', 
-    'D 9 x', 
-    'L 3 x', 
-    'U 3 x', 
-    'L 3 x', 
-    'D 3 x', 
-    'L 3 x', 
-    'U 9 x', 
-    ]
-
-t = part_1(chrstine_test)
-
-assert t == 88, t
-
 p1 = part_1(lines)
-assert p1 != 87847
 
 print('Part 1: ', p1)
 
+def part_2(lines):
+    grid = set()
+
+    pnt = [0,0]
+    grid.add(tuple(pnt))
+
+    perimeter = 0
+
+    for line in lines:
+        _, __, code = line.split()
+        num = int(code[2:-2], 16)
+        d = code[-2]
+
+        dx = 0
+        dy = 0
+        if d == '3':
+            dy = -1
+        elif d == '1':
+            dy = 1
+        elif d == '2':
+            dx = -1
+        elif d == '0':
+            dx = 1
+        else:
+            raise Exception('Unknown direction')
+
+        pnt[0] += dx * num
+        pnt[1] += dy * num
+        grid.add(tuple(pnt))
+        perimeter += num
+
+    return (shoelace(grid) + perimeter) // 2 + 1
+
+t = part_2(test_lines)
+assert t == 952408144115, t
+print('Part 2: ', part_2(lines))
