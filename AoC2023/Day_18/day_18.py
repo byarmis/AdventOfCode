@@ -6,14 +6,15 @@ def shoelace(grid):
     grid = list(grid)
     area = 0
 
-    for i, j in zip(grid, grid[1:]):
-        area += (i[1]+j[1]) * (i[0] - j[0])
-    i = grid[-1]
-    j = grid[0]
-    area += (i[1]+j[1]) * (i[0] - j[0])
-    print('a',area)
+    for first, second in zip(grid, grid[1:]):
+        x1, y1 = first
+        x2, y2 = second
+        area += ((y1+y2)*(x1-x2))
+    x1, y1 = grid[-1]
+    x2, y2 = grid[0]
+    area += ((y1+y2)*(x1-x2))
 
-    return abs(area)
+    return abs(area) 
 
 def part_1(lines):
     grid = set()
@@ -45,8 +46,7 @@ def part_1(lines):
         grid.add(tuple(pnt))
         perimeter += num
 
-    print('p',perimeter)
-    return shoelace(grid) + perimeter
+    return (shoelace(grid) + perimeter) // 2 + 1
 
 test_lines = [
     'R 6 (#70c710)',
