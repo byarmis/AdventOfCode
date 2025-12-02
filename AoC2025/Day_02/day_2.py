@@ -13,6 +13,9 @@ def part_1(i):
 
         if num == i:
             return True
+        elif len(num) > len(i):
+            break
+
     return False
 
 
@@ -30,7 +33,9 @@ assert part_1(11)
 assert part_1(1188511885)
 assert solve(tst, part_1) == 1227775554
  
-print('Part 1: ', solve(get_problem(), part_1))
+p1 = solve(get_problem(), part_1)
+assert p1 == 44854383294
+print('Part 1: ', p1)
 
 def part_2(i):
     i = str(i)
@@ -43,9 +48,14 @@ def part_2(i):
             if num == i:
                 return True
 
+        if subset_length > len(i) // 2 + 1:
+            break
+
     return False
 
 assert solve(tst, part_2) == 4174379265
+p2 = solve(get_problem(), part_2)
+assert p2 == 55647141923
 
-print('Part 2: ', solve(get_problem(), part_2))
+print('Part 2: ', p2)
 
